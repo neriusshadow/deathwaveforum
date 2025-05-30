@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Выйти{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title mb-4">Выйти</h2>
+                <p class="mb-4">Вы уверены, что хотите выйти?</p>
+                <form method="post" action="{% url 'account_logout' %}">
+                    {% csrf_token %}
+                    <button class="btn btn-danger" type="submit">Выйти</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

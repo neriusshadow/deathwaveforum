@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ topic.title }} - deathwave{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2>{{ topic.title }}</h2>
+        <p class="text-muted mb-0">
+            Категория: <a href="{% url 'forum:category_detail' topic.category.slug %}" class="text-decoration-none">
+                {{ topic.category.name }}
+            </a>
+        </p>
+    </div>
+    <div class="d-flex align-items-center">
+        {% if topic.is_pinned %}
+        <span class="badge bg-warning me-2">Закреплено</span>
+        {% endif %}
+        {% if topic.is_closed %}
+        <span class="badge bg-danger me-2">Закрыто</span>
+        {% endif %}
+        {% if user == topic.author %}
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                Действия
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                    <a class="dropdown-item" href="{% url 'forum:topic_edit' topic.slug %}">
+                        <i class="bi bi-pencil"></i> Редактировать
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item text-danger" href="{% url 'forum:topic_delete' topic.slug %}">
+                        <i class="bi bi-trash"></i> Удалить
+                    </a>
+                </li>
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex">
+            <div class="flex-shrink-0 me-3">
+                {% if topic.author.profile.avatar %}
+                <img src="{{ topic.author.profile.avatar.url }}" alt="{{ topic.author.username }}" class="rounded-circle" style="width: 64px; height: 64px; object-fit: cover;">
+                {% else %}
+                <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                    <i class="bi bi-person-fill text-white" style="font-size: 2rem;"></i>
+                </div>
+                {% endif %}
+            </div>
+            <div class="flex-grow-1">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <h5 class="mb-0">
+                            <a href="{% url 'users:user_profile' topic.author.username %}" class="text-decoration-none">
+                                {{ topic.author.username }}
+                            </a>
+                        </h5>
+                        <small class="text-muted">{{ topic.created_at|date:"d.m.Y H:i" }}</small>
+                    </div>
+                    <div>
+                        <span class="badge bg-primary">Автор</span>
+                    </div>
+                </div>
+                <div class="topic-content">
+                    {{ topic.content|linebreaks }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% for post in posts %}
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex">
+            <div class="flex-shrink-0 me-3">
+                {% if post.author.profile.avatar %}
+                <img src="{{ post.author.profile.avatar.url }}" alt="{{ post.author.username }}" class="rounded-circle" style="width: 64px; height: 64px; object-fit: cover;">
+                {% else %}
+                <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 64px; height: 64px;">
+                    <i class="bi bi-person-fill text-white" style="font-size: 2rem;"></i>
+                </div>
+                {% endif %}
+            </div>
+            <div class="flex-grow-1">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <h5 class="mb-0">
+                            <a href="{% url 'users:user_profile' post.author.username %}" class="text-decoration-none">
+                                {{ post.author.username }}
+                            </a>
+                        </h5>
+                        <small class="text-muted">{{ post.created_at|date:"d.m.Y H:i" }}</small>
+                    </div>
+                    <div>
+                        {% if post.is_solution %}
+                        <span class="badge bg-success me-2">Решение</span>
+                        {% endif %}
+                        {% if user == post.author %}
+                        <div class="dropdown d-inline-block">
+                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                Действия
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'forum:post_edit' post.pk %}">
+                                        <i class="bi bi-pencil"></i> Редактировать
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="{% url 'forum:post_delete' post.pk %}">
+                                        <i class="bi bi-trash"></i> Удалить
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="post-content">
+                    {{ post.content|linebreaks }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% if topics.has_other_pages %}
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if topics.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ topics.previous_page_number }}">Предыдущая</a>
+        </li>
+        {% endif %}
+
+        {% for num in topics.paginator.page_range %}
+        {% if topics.number == num %}
+        <li class="page-item active">
+            <span class="page-link">{{ num }}</span>
+        </li>
+        {% else %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        </li>
+        {% endif %}
+        {% endfor %}
+
+        {% if topics.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ topics.next_page_number }}">Следующая</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+{% if user.is_authenticated and not topic.is_closed %}
+<div class="card mt-4">
+    <div class="card-body">
+        <h5 class="card-title">Добавить ответ</h5>
+        <form method="post" action="{% url 'forum:post_create' topic.slug %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <textarea name="content" class="form-control" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Отправить</button>
+        </form>
+    </div>
+</div>
+{% endif %}
+{% endblock %} 

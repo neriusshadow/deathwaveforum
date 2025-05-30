@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+{% if form.instance.pk %}
+Редактирование темы - {{ form.instance.title }}
+{% else %}
+Создать новую тему
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title mb-4">
+                    {% if form.instance.pk %}
+                    Редактирование темы
+                    {% else %}
+                    Создать новую тему
+                    {% endif %}
+                </h2>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            {% if form.instance.pk %}
+                            <i class="bi bi-save"></i> Сохранить изменения
+                            {% else %}
+                            <i class="bi bi-plus-lg"></i> Создать тему
+                            {% endif %}
+                        </button>
+                        {% if form.instance.pk %}
+                        <a href="{% url 'forum:topic_detail' form.instance.slug %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x"></i> Отмена
+                        </a>
+                        {% else %}
+                         <a href="{% url 'forum:home' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x"></i> Отмена
+                        </a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

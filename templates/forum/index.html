@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная - deathwave{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h2 class="mb-4">Категории</h2>
+        {% for category in categories %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <a href="{% url 'forum:category_detail' category.slug %}" class="text-decoration-none">
+                        {{ category.name }}
+                    </a>
+                </h5>
+                {% if category.description %}
+                <p class="card-text text-muted">{{ category.description }}</p>
+                {% endif %}
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        Тем: {{ category.topics.count }}
+                    </small>
+                    <a href="{% url 'forum:category_detail' category.slug %}" class="btn btn-primary btn-sm">
+                        Перейти
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="alert alert-info">
+            Категории пока не созданы.
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Последние темы</h5>
+            </div>
+            <div class="card-body">
+                {% for topic in latest_topics %}
+                <div class="mb-3">
+                    <h6 class="mb-1">
+                        <a href="{% url 'forum:topic_detail' topic.slug %}" class="text-decoration-none">
+                            {{ topic.title }}
+                        </a>
+                    </h6>
+                    <small class="text-muted">
+                        {{ topic.created_at|date:"d.m.Y H:i" }} • {{ topic.author.username }}
+                    </small>
+                </div>
+                {% empty %}
+                <p class="text-muted mb-0">Тем пока нет.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if user.is_authenticated %}
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5 class="card-title">Быстрые действия</h5>
+                <a href="{% url 'forum:topic_create' %}" class="btn btn-primary w-100">
+                    Создать тему
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

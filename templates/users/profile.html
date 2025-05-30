@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}Профиль - {{ user.username }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                {% if user.profile.avatar %}
+                <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                {% else %}
+                <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 150px; height: 150px;">
+                    <i class="bi bi-person-fill text-white" style="font-size: 5rem;"></i>
+                </div>
+                {% endif %}
+                <h4 class="card-title">{{ user.username }}</h4>
+                {% if user.profile.bio %}
+                <p class="card-text">{{ user.profile.bio }}</p>
+                {% endif %}
+                <div class="d-flex justify-content-center gap-2 mb-3">
+                    {% if user.profile.location %}
+                    <span class="badge bg-secondary">
+                        <i class="bi bi-geo-alt"></i> {{ user.profile.location }}
+                    </span>
+                    {% endif %}
+                    {% if user.profile.birth_date %}
+                    <span class="badge bg-secondary">
+                        <i class="bi bi-calendar"></i> {{ user.profile.birth_date|date:"d.m.Y" }}
+                    </span>
+                    {% endif %}
+                </div>
+                <a href="{% url 'users:profile_edit' %}" class="btn btn-primary">
+                    <i class="bi bi-pencil"></i> Редактировать профиль
+                </a>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5 class="card-title">Статистика</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Темы
+                        <span class="badge bg-primary rounded-pill">{{ user.topics.count }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Сообщения
+                        <span class="badge bg-primary rounded-pill">{{ user.posts.count }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Репутация
+                        <span class="badge bg-success rounded-pill">{{ user.profile.reputation }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <ul class="nav nav-tabs card-header-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#topics" data-bs-toggle="tab">Мои темы</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#posts" data-bs-toggle="tab">Мои сообщения</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="topics">
+                        {% for topic in user.topics.all %}
+                        <div class="mb-3">
+                            <h5 class="mb-1">
+                                <a href="{% url 'forum:topic_detail' topic.slug %}" class="text-decoration-none">
+                                    {{ topic.title }}
+                                </a>
+                            </h5>
+                            <small class="text-muted">
+                                {{ topic.created_at|date:"d.m.Y H:i" }} • 
+                                Ответов: {{ topic.posts.count }} • 
+                                Просмотров: {{ topic.views }}
+                            </small>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted mb-0">У вас пока нет созданных тем.</p>
+                        {% endfor %}
+                    </div>
+                    <div class="tab-pane fade" id="posts">
+                        {% for post in user.posts.all %}
+                        <div class="mb-3">
+                            <h5 class="mb-1">
+                                <a href="{% url 'forum:topic_detail' post.topic.slug %}" class="text-decoration-none">
+                                    {{ post.topic.title }}
+                                </a>
+                            </h5>
+                            <p class="mb-1">{{ post.content|truncatewords:30 }}</p>
+                            <small class="text-muted">
+                                {{ post.created_at|date:"d.m.Y H:i" }}
+                            </small>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted mb-0">У вас пока нет сообщений.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

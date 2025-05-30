@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Результаты поиска{% endblock %}
+
+{% block content %}
+<h2>Результаты поиска{% if query %} по запросу "{{ query }}"{% endif %}</h2>
+
+{% if topics or posts %}
+    <h3>Темы</h3>
+    {% if topics %}
+        <ul class="list-group mb-4">
+            {% for topic in topics %}
+                <li class="list-group-item">
+                    <a href="{% url 'forum:topic_detail' topic.slug %}">{{ topic.title }}</a>
+                    <p><small class="text-muted">Автор: {{ topic.author.username }} | Дата: {{ topic.created_at|date:"d.m.Y H:i" }}</small></p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Тем не найдено.</p>
+    {% endif %}
+
+    <h3>Сообщения</h3>
+    {% if posts %}
+        <ul class="list-group">
+            {% for post in posts %}
+                <li class="list-group-item">
+                    <a href="{% url 'forum:topic_detail' post.topic.slug %}#post-{{ post.pk }}">{{ post.content|truncatewords:30 }}</a>
+                    <p><small class="text-muted">В теме: <a href="{% url 'forum:topic_detail' post.topic.slug %}">{{ post.topic.title }}</a> | Автор: {{ post.author.username }} | Дата: {{ post.created_at|date:"d.m.Y H:i" }}</small></p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Сообщений не найдено.</p>
+    {% endif %}
+
+{% else %}
+    <p>По вашему запросу ничего не найдено.</p>
+{% endif %}
+
+{% endblock %} 
